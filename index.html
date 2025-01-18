@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Go Chat App</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        #messages { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+        #message { width: 80%; }
+    </style>
+</head>
+<body>
+    <h1>Go Chat App</h1>
+    <div id="messages"></div>
+    <input id="message" type="text" placeholder="Type a message..." />
+    <button id="send">Send</button>
+
+    <script>
+        const messages = document.getElementById("messages");
+        const messageInput = document.getElementById("message");
+        const sendButton = document.getElementById("send");
+
+        const conn = new WebSocket("ws://localhost:8080/ws");
+
+        conn.onmessage = function(event) {
+            const msg = document.createElement("div");
+            msg.textContent = event.data;
+             messages.appendChild(msg);
+            messages.scrollTop = messages.scrollHeight; // Scroll to the bottom
+        };
+
+        sendButton.onclick = function() {
+            const msg = messageInput.value;
+            if (msg) {
+                conn.send(msg);
+                messageInput.value = ""; // Clear input field
+            }
+        };
+
+        messageInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendButton.click(); // Send message on Enter key press
+            }
+        });
+    </script>
+</body>
+</html>
